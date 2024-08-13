@@ -12,7 +12,7 @@ const fontSans = FontSans({
   variable: '--font-sans'
 })
 export const metadata: Metadata = {
-  title: 'Big Boy Restaurant',
+  title: '5 Star Restaurant',
   description: 'The best restaurant in the world'
 }
 
