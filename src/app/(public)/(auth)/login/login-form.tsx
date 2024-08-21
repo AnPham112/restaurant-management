@@ -9,6 +9,7 @@ import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
@@ -29,7 +30,10 @@ export default function LoginForm() {
         description: result.payload.message,
       })
     } catch (error: any) {
-      console.log(error)
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      })
     }
   }
 
