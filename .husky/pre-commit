@@ -1,3 +1,1 @@
-npm run prettier:fix
-git add .
-git commit -m "format-code"
+npx lint-staged
