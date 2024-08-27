@@ -78,7 +78,7 @@ export default function UpdateProfileForm() {
     }
   }
 
-  const handleReset = () => {
+  const reset = () => {
     form.reset()
     setFile(null)
   }
@@ -88,7 +88,7 @@ export default function UpdateProfileForm() {
       <form
         noValidate
         className="grid auto-rows-max items-start gap-4 md:gap-8"
-        onReset={handleReset}
+        onReset={reset}
         onSubmit={form.handleSubmit(onSubmit, (error) => {
           console.log(error)
         })}
