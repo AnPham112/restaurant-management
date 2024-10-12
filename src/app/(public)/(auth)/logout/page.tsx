@@ -30,7 +30,7 @@ function Logout() {
     })
   }, [router, mutateAsync, refreshTokenFromUrl, accessTokenFromUrl])
 
-  return null
+  return <div>Logout...</div>
 }
 
 export default Logout
