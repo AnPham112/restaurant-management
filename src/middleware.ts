@@ -11,7 +11,9 @@ export function middleware(request: NextRequest) {
 
   // chưa đăng nhập thì không cho vào privatePaths đưa về trang login
   if (privatePaths.some((pp) => pathname.startsWith(pp)) && !refreshToken) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const url = new URL('/login', request.url)
+    url.searchParams.set('clearTokens', 'true')
+    return NextResponse.redirect(url)
   }
 
   if (unAuthPaths.some((up) => pathname.startsWith(up)) && refreshToken) {
@@ -23,8 +25,9 @@ export function middleware(request: NextRequest) {
     !accessToken &&
     refreshToken
   ) {
-    const url = new URL('/logout', request.url)
+    const url = new URL('/refresh-token', request.url)
     url.searchParams.set('refreshToken', refreshToken)
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 
