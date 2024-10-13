@@ -23,11 +23,15 @@ export const decodeToken = (token: string) => {
 
 const isClient = typeof window !== 'undefined'
 
-export const getAccessTokenFromLocalStorage = () => (isClient ? localStorage.getItem('accessToken') : null)
-export const getRefreshTokenFromLocalStorage = () => (isClient ? localStorage.getItem('refreshToken') : null)
+export const getAccessTokenFromLocalStorage = () =>
+  isClient ? localStorage.getItem('accessToken') : null
+export const getRefreshTokenFromLocalStorage = () =>
+  isClient ? localStorage.getItem('refreshToken') : null
 
-export const setAccessTokenToLocalStorage = (value: string) => isClient && localStorage.setItem('accessToken', value)
-export const setRefreshTokenToLocalStorage = (value: string) => isClient && localStorage.setItem('refreshToken', value)
+export const setAccessTokenToLocalStorage = (value: string) =>
+  isClient && localStorage.setItem('accessToken', value)
+export const setRefreshTokenToLocalStorage = (value: string) =>
+  isClient && localStorage.setItem('refreshToken', value)
 
 export const removeTokensFromLocalStorage = () => {
   isClient && localStorage.removeItem('accessToken')
@@ -60,7 +64,10 @@ export const handleErrorApi = ({
   }
 }
 
-export const checkAndRefreshToken = async (param?: { onError?: () => void; onSuccess?: () => void }) => {
+export const checkAndRefreshToken = async (param?: {
+  onError?: () => void
+  onSuccess?: () => void
+}) => {
   // Không nên đưa logic lấy access và refresh token ra khỏi cái function `checkAndRefreshToken`
   // Vì để mỗi lần mà checkAndRefreshToken() được gọi thì chúng ta se có một access và refresh token mới
   // Tránh hiện tượng bug nó lấy access và refresh token cũ ở lần đầu rồi gọi cho các lần tiếp theo
@@ -72,7 +79,7 @@ export const checkAndRefreshToken = async (param?: { onError?: () => void; onSuc
   const decodedRefreshToken = decodeToken(refreshToken)
   // thời điểm hết hạn của token là tính theo epoch time (s)
   // Còn khi các bạn dùng cú pháp new Date().getTime() thì nó sẽ trả về epoch time (ms)
-  const now = Math.round(new Date().getTime() / 1000)
+  const now = new Date().getTime() / 1000 - 1 // - 1s thì sẽ không check decodedRefreshToken.exp <= now , nó sẽ gọi xuống api phía dưới và chạy vào catch(error) thì sẽ logout ra
   // Trường hợp refresh token hết hạn thì logout
   if (decodedRefreshToken.exp <= now) {
     removeTokensFromLocalStorage()
@@ -82,7 +89,10 @@ export const checkAndRefreshToken = async (param?: { onError?: () => void; onSuc
   // thì mình sẽ kiểm tra thời gian còn 1/3 thời gian (10 / 3 -> 3s) thì sẽ cho refresh token lại
   // Thời gian còn lại của accessToken sẽ tính dựa trên công thức: decodedAccessToken.exp - now
   // Thời gian hết hạn của accessToken sẽ tính dựa trên công thức: decodedAccessToken.exp - decodedAccessToken.iat
-  if (decodedAccessToken.exp - now < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
+  if (
+    decodedAccessToken.exp - now <
+    (decodedAccessToken.exp - decodedAccessToken.iat) / 3
+  ) {
     try {
       const res = await authApiRequest.refreshToken()
       setAccessTokenToLocalStorage(res.payload.data.accessToken)

@@ -1,5 +1,4 @@
 import accountApiRequest from '@/apiRequests/account'
-import { AccountResType } from '@/schemaValidations/account.schema'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 export const useAccountMe = () => {

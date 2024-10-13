@@ -18,7 +18,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
   // Trường hợp đăng nhập rồi, nhwung access token lại hết hạn
-  if (privatePaths.some((pp) => pathname.startsWith(pp)) && !accessToken && refreshToken) {
+  if (
+    privatePaths.some((pp) => pathname.startsWith(pp)) &&
+    !accessToken &&
+    refreshToken
+  ) {
     const url = new URL('/logout', request.url)
     url.searchParams.set('refreshToken', refreshToken)
     return NextResponse.redirect(url)

@@ -5,7 +5,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Upload } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.schema'
+import {
+  UpdateMeBody,
+  UpdateMeBodyType,
+} from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -28,20 +31,29 @@ export default function UpdateProfileForm() {
       avatar: undefined,
     },
   })
-  const avatar = form.watch('avatar')
-  const profileName = form.watch('name')
 
   useEffect(() => {
     if (data) {
-      const { name, avatar } = data.payload.data
-      // form.setValue('name', name)
-      // form.setValue('avatar', avatar ?? undefined)
+      const { avatar, name } = data.payload.data
+
       form.reset({
-        name: name,
         avatar: avatar ?? undefined,
+        name: name ?? undefined,
       })
     }
-  }, [data, form])
+  }, [form, data])
+
+  const handleRemoveAvatar = (field: any) => {
+    setFile(null)
+    form.setValue('avatar', '')
+    field.onChange('')
+    if (avatarInputRef.current) {
+      avatarInputRef.current.value = ''
+    }
+  }
+
+  const avatar = form.watch('avatar')
+  const name = form.watch('name')
 
   const previewAvatar = useMemo(() => {
     if (file) {
@@ -57,8 +69,8 @@ export default function UpdateProfileForm() {
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-        const uploadImageResult = await uploadMediaMutation.mutateAsync(formData)
-
+        const uploadImageResult =
+          await uploadMediaMutation.mutateAsync(formData)
         const imageUrl = uploadImageResult.payload.data
         body = {
           ...values,
@@ -83,15 +95,15 @@ export default function UpdateProfileForm() {
     setFile(null)
   }
 
+  console.log('avatar', avatar)
+
   return (
     <Form {...form}>
       <form
         noValidate
         className="grid auto-rows-max items-start gap-4 md:gap-8"
+        onSubmit={form.handleSubmit(onSubmit, (e) => console.log(e))}
         onReset={reset}
-        onSubmit={form.handleSubmit(onSubmit, (error) => {
-          console.log(error)
-        })}
       >
         <Card x-chunk="dashboard-07-chunk-0">
           <CardHeader>
@@ -107,7 +119,9 @@ export default function UpdateProfileForm() {
                     <div className="flex gap-2 items-start justify-start">
                       <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
                         <AvatarImage src={previewAvatar} />
-                        <AvatarFallback className="rounded-none">{profileName}</AvatarFallback>
+                        <AvatarFallback className="rounded-none">
+                          {name}
+                        </AvatarFallback>
                       </Avatar>
                       <input
                         type="file"
@@ -118,7 +132,9 @@ export default function UpdateProfileForm() {
                           const file = e.target.files?.[0]
                           if (file) {
                             setFile(file)
-                            field.onChange('http://localhost:3000/' + field.name)
+                            field.onChange(
+                              'http://localhost:3000/' + field.name,
+                            )
                           }
                         }}
                       />
@@ -130,6 +146,16 @@ export default function UpdateProfileForm() {
                         <Upload className="h-4 w-4 text-muted-foreground" />
                         <span className="sr-only">Upload</span>
                       </button>
+
+                      <Button
+                        type="button"
+                        className="text-sm"
+                        variant={'destructive'}
+                        size={'sm'}
+                        onClick={() => handleRemoveAvatar(field)}
+                      >
+                        Remove avatar
+                      </Button>
                     </div>
                   </FormItem>
                 )}
@@ -142,7 +168,12 @@ export default function UpdateProfileForm() {
                   <FormItem>
                     <div className="grid gap-3">
                       <Label htmlFor="name">Tên</Label>
-                      <Input id="name" type="text" className="w-full" {...field} />
+                      <Input
+                        id="name"
+                        type="text"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>

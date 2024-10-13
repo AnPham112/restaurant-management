@@ -1,5 +1,8 @@
 import envConfig from '@/config'
-import { AUTHENTICATION_ERROR_STATUS, ENTITY_ERROR_STATUS } from '@/constants/type'
+import {
+  AUTHENTICATION_ERROR_STATUS,
+  ENTITY_ERROR_STATUS,
+} from '@/constants/type'
 import {
   getAccessTokenFromLocalStorage,
   normalizePath,
@@ -28,7 +31,15 @@ export class HttpError extends Error {
     message: string
     [key: string]: any
   }
-  constructor({ status, payload, message = 'HTTP error' }: { status: number; payload: any; message?: string }) {
+  constructor({
+    status,
+    payload,
+    message = 'HTTP error',
+  }: {
+    status: number
+    payload: any
+    message?: string
+  }) {
     super(message)
     this.status = status
     this.payload = payload
@@ -38,7 +49,13 @@ export class HttpError extends Error {
 export class EntityError extends HttpError {
   status: typeof ENTITY_ERROR_STATUS
   payload: EntityErrorPayload
-  constructor({ status, payload }: { status: typeof ENTITY_ERROR_STATUS; payload: EntityErrorPayload }) {
+  constructor({
+    status,
+    payload,
+  }: {
+    status: typeof ENTITY_ERROR_STATUS
+    payload: EntityErrorPayload
+  }) {
     super({ status, payload, message: 'Entity Error' })
     this.status = status
     this.payload = payload
@@ -59,7 +76,8 @@ const request = async <Response>(
   } else if (options?.body) {
     body = JSON.stringify(options.body)
   }
-  const baseHeaders: { [key: string]: string } = body instanceof FormData ? {} : { 'Content-Type': 'application/json' }
+  const baseHeaders: { [key: string]: string } =
+    body instanceof FormData ? {} : { 'Content-Type': 'application/json' }
   if (isClient) {
     const accessToken = getAccessTokenFromLocalStorage()
     if (accessToken) {
@@ -68,7 +86,10 @@ const request = async <Response>(
   }
   // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.NEXT_PUBLIC_API_ENDPOINT
   // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server
-  const baseUrl = options?.baseUrl === undefined ? envConfig.NEXT_PUBLIC_API_ENDPOINT : options.baseUrl
+  const baseUrl =
+    options?.baseUrl === undefined
+      ? envConfig.NEXT_PUBLIC_API_ENDPOINT
+      : options.baseUrl
 
   const fullUrl = `${baseUrl}/${normalizePath(url)}`
   const res = await fetch(fullUrl, {
@@ -123,7 +144,9 @@ const request = async <Response>(
         // Đây là trường hợp khi mà chúng ta vẫn còn access token (còn hạn)
         // Và chúng ta gọi API ở Next.js Server (Route Handler , Server Component) đến Server Backend
         // Nếu Server trả về lỗi thì redirect logout?accessToken=.....
-        const accessToken = (options?.headers as any)?.Authorization.split('Bearer ')[1]
+        const accessToken = (options?.headers as any)?.Authorization.split(
+          'Bearer ',
+        )[1]
         redirect(`/logout?accessToken=${accessToken}`)
       }
     } else {
@@ -144,7 +167,9 @@ const request = async <Response>(
       }
       setAccessTokenToLocalStorage(accessToken)
       setRefreshTokenToLocalStorage(refreshToken)
-    } else if (['api/auth/logout', 'api/guest/auth/logout'].includes(normalizeUrl)) {
+    } else if (
+      ['api/auth/logout', 'api/guest/auth/logout'].includes(normalizeUrl)
+    ) {
       removeTokensFromLocalStorage()
     }
   }
@@ -153,16 +178,30 @@ const request = async <Response>(
 }
 
 const http = {
-  get<Response>(url: string, options?: Omit<CustomOptions, 'body'> | undefined) {
+  get<Response>(
+    url: string,
+    options?: Omit<CustomOptions, 'body'> | undefined,
+  ) {
     return request<Response>('GET', url, options)
   },
-  post<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
+  post<Response>(
+    url: string,
+    body: any,
+    options?: Omit<CustomOptions, 'body'> | undefined,
+  ) {
     return request<Response>('POST', url, { ...options, body })
   },
-  put<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
+  put<Response>(
+    url: string,
+    body: any,
+    options?: Omit<CustomOptions, 'body'> | undefined,
+  ) {
     return request<Response>('PUT', url, { ...options, body })
   },
-  delete<Response>(url: string, options?: Omit<CustomOptions, 'body'> | undefined) {
+  delete<Response>(
+    url: string,
+    options?: Omit<CustomOptions, 'body'> | undefined,
+  ) {
     return request<Response>('DELETE', url, { ...options })
   },
 }

@@ -33,7 +33,8 @@ const authApiRequest = {
   cLogout: () => {
     return http.post('/api/auth/logout', null, { baseUrl: '' })
   },
-  sRefreshToken: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>('/auth/refresh-token', body),
+  sRefreshToken: (body: RefreshTokenBodyType) =>
+    http.post<RefreshTokenResType>('/auth/refresh-token', body),
   // refreshToken: () =>
   //   http.post<RefreshTokenResType>('/api/auth/refresh-token', null, {
   //     baseUrl: '',
@@ -43,9 +44,13 @@ const authApiRequest = {
     if (this.refreshTokenRequest) {
       return this.refreshTokenRequest
     }
-    this.refreshTokenRequest = http.post<RefreshTokenResType>('/api/auth/refresh-token', null, {
-      baseUrl: '',
-    })
+    this.refreshTokenRequest = http.post<RefreshTokenResType>(
+      '/api/auth/refresh-token',
+      null,
+      {
+        baseUrl: '',
+      },
+    )
 
     const res = await this.refreshTokenRequest
     this.refreshTokenRequest = null

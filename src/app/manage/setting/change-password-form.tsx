@@ -5,7 +5,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 import { useForm } from 'react-hook-form'
-import { ChangePasswordBody, ChangePasswordBodyType } from '@/schemaValidations/account.schema'
+import {
+  ChangePasswordBody,
+  ChangePasswordBodyType,
+} from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { useChangePasswordMutation } from '@/queries/useAccount'
@@ -66,7 +69,12 @@ export default function ChangePasswordForm() {
                   <FormItem>
                     <div className="grid gap-3">
                       <Label htmlFor="oldPassword">Mật khẩu cũ</Label>
-                      <Input id="oldPassword" type="password" className="w-full" {...field} />
+                      <Input
+                        id="oldPassword"
+                        type="password"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -79,7 +87,12 @@ export default function ChangePasswordForm() {
                   <FormItem>
                     <div className="grid gap-3">
                       <Label htmlFor="password">Mật khẩu mới</Label>
-                      <Input id="password" type="password" className="w-full" {...field} />
+                      <Input
+                        id="password"
+                        type="password"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -91,8 +104,15 @@ export default function ChangePasswordForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid gap-3">
-                      <Label htmlFor="confirmPassword">Nhập lại mật khẩu mới</Label>
-                      <Input id="confirmPassword" type="password" className="w-full" {...field} />
+                      <Label htmlFor="confirmPassword">
+                        Nhập lại mật khẩu mới
+                      </Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>

@@ -1,6 +1,12 @@
 'use client'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm } from 'react-hook-form'
@@ -44,7 +50,9 @@ export default function LoginForm() {
     <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Đăng nhập</CardTitle>
-        <CardDescription>Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống</CardDescription>
+        <CardDescription>
+          Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -61,7 +69,13 @@ export default function LoginForm() {
                   <FormItem>
                     <div className="grid gap-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" placeholder="m@example.com" required {...field} />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        required
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -76,7 +90,12 @@ export default function LoginForm() {
                       <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
                       </div>
-                      <Input id="password" type="password" required {...field} />
+                      <Input
+                        id="password"
+                        type="password"
+                        required
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
