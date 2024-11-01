@@ -1,3 +1,5 @@
+import { UseQueryOptions } from '@tanstack/react-query'
+
 export const ENTITY_ERROR_STATUS = 422
 export const AUTHENTICATION_ERROR_STATUS = 401
 
@@ -57,3 +59,17 @@ export const OrderStatusValues = [
 ] as const
 
 export const ManagerRoom = 'manager' as const
+
+export type ResponseApi<T> = {
+  status: number
+  payload: T
+}
+
+export type QueryOptions<T> = Omit<
+  UseQueryOptions<ResponseApi<T>>,
+  'queryKey' | 'queryFn'
+>
+
+export const QueryKey = {
+  ACCOUNTS: 'accounts',
+} as const
