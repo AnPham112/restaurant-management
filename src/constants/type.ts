@@ -67,7 +67,7 @@ export type ResponseApi<T> = {
 
 export type QueryOptions<T> = Omit<
   UseQueryOptions<ResponseApi<T>>,
-  'queryKey' | 'queryFn'
+  'queryKey' | 'queryFn' | 'enabled'
 >
 
 export const QueryKey = {

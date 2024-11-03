@@ -62,8 +62,8 @@ export default function AddEmployee() {
           await uploadMediaMutation.mutateAsync(formData)
         const imageUrl = uploadImageResult.payload.data
         body = {
-          avatar: imageUrl,
           ...values,
+          avatar: imageUrl,
         }
       }
       const result = await addAccountMutation.mutateAsync(body)
@@ -107,7 +107,7 @@ export default function AddEmployee() {
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="add-employee-form"
-            onSubmit={form.handleSubmit(onSubmit, (e) => console.log(e))}
+            onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}
             onReset={reset}
           >
             <div className="grid gap-4 py-4">

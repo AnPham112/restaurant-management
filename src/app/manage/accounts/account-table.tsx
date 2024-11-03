@@ -40,7 +40,7 @@ import {
 import AddEmployee from '@/app/manage/accounts/add-employee'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import EditEmployee from '@/app/manage/accounts/edit-employee'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,22 +53,32 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
+import { useGetAccountList } from '@/queries/useAccount'
+import { useEmployeeManagementStore } from '@/stores/useEmployeeManagementStore'
 
 type AccountItem = AccountListResType['data'][0]
 
-const AccountTableContext = createContext<{
-  setEmployeeIdEdit: (value: number) => void
-  employeeIdEdit: number | undefined
-  employeeDelete: AccountItem | null
-  setEmployeeDelete: (value: AccountItem | null) => void
-}>({
-  setEmployeeIdEdit: (value: number | undefined) => {},
-  employeeIdEdit: undefined,
-  employeeDelete: null,
-  setEmployeeDelete: (value: AccountItem | null) => {},
-})
+// const AccountTableContext = createContext<{
+//   setEmployeeIdEdit: (value: number) => void
+//   employeeIdEdit: number | undefined
+//   employeeDelete: AccountItem | null
+//   setEmployeeDelete: (value: AccountItem | null) => void
+// }>({
+//   setEmployeeIdEdit: (value: number | undefined) => {},
+//   employeeIdEdit: undefined,
+//   employeeDelete: null,
+//   setEmployeeDelete: (value: AccountItem | null) => {},
+// })
 
 export const columns: ColumnDef<AccountType>[] = [
+  {
+    id: 'stt',
+    header: 'STT',
+    cell: ({ row }) => {
+      return <>{row.index + 1}</>
+    },
+  },
+
   {
     accessorKey: 'id',
     header: 'ID',
@@ -105,14 +115,16 @@ export const columns: ColumnDef<AccountType>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
   },
   {
     id: 'actions',
     enableHiding: false,
     cell: function Actions({ row }) {
+      // const { setEmployeeIdEdit, setEmployeeDelete } =
+      //   useContext(AccountTableContext)
+
       const { setEmployeeIdEdit, setEmployeeDelete } =
-        useContext(AccountTableContext)
+        useEmployeeManagementStore((state) => state)
       const openEditEmployee = () => {
         setEmployeeIdEdit(row.original.id)
       }
@@ -184,9 +196,16 @@ export default function AccountTable() {
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
   const pageIndex = page - 1
   // const params = Object.fromEntries(searchParam.entries())
-  const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
-  const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
+  // const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
+  // const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
+  const {
+    employeeIdEdit,
+    setEmployeeIdEdit,
+    employeeDelete,
+    setEmployeeDelete,
+  } = useEmployeeManagementStore((state) => state)
+  const accountListQuery = useGetAccountList()
+  const data = accountListQuery.data?.payload.data ?? []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -226,102 +245,101 @@ export default function AccountTable() {
   }, [table, pageIndex])
 
   return (
-    <AccountTableContext.Provider
-      value={{
-        employeeIdEdit,
-        setEmployeeIdEdit,
-        employeeDelete,
-        setEmployeeDelete,
-      }}
-    >
-      <div className="w-full">
-        <EditEmployee
-          id={employeeIdEdit}
-          setId={setEmployeeIdEdit}
-          onSubmitSuccess={() => {}}
+    // <AccountTableContext.Provider
+    //   value={{
+    //     employeeIdEdit,
+    //     setEmployeeIdEdit,
+    //     employeeDelete,
+    //     setEmployeeDelete,
+    //   }}
+    // >
+    <div className="w-full">
+      <EditEmployee
+        id={employeeIdEdit}
+        setId={setEmployeeIdEdit}
+        onSubmitSuccess={() => {}}
+      />
+      <AlertDialogDeleteAccount
+        employeeDelete={employeeDelete}
+        setEmployeeDelete={setEmployeeDelete}
+      />
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter emails..."
+          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
+          onChange={(event) =>
+            table.getColumn('email')?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
         />
-        <AlertDialogDeleteAccount
-          employeeDelete={employeeDelete}
-          setEmployeeDelete={setEmployeeDelete}
-        />
-        <div className="flex items-center py-4">
-          <Input
-            placeholder="Filter emails..."
-            value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-            onChange={(event) =>
-              table.getColumn('email')?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-          <div className="ml-auto flex items-center gap-2">
-            <AddEmployee />
-          </div>
-        </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị{' '}
-            <strong>{table.getPaginationRowModel().rows.length}</strong> trong{' '}
-            <strong>{data.length}</strong> kết quả
-          </div>
-          <div>
-            <AutoPagination
-              page={table.getState().pagination.pageIndex + 1}
-              pageSize={table.getPageCount()}
-              pathname="/manage/accounts"
-            />
-          </div>
+        <div className="ml-auto flex items-center gap-2">
+          <AddEmployee />
         </div>
       </div>
-    </AccountTableContext.Provider>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-xs text-muted-foreground py-4 flex-1 ">
+          Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong>{' '}
+          trong <strong>{data.length}</strong> kết quả
+        </div>
+        <div>
+          <AutoPagination
+            page={table.getState().pagination.pageIndex + 1}
+            pageSize={table.getPageCount()}
+            pathname="/manage/accounts"
+          />
+        </div>
+      </div>
+    </div>
+    // </AccountTableContext.Provider>
   )
 }

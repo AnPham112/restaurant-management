@@ -102,7 +102,7 @@ export default function UpdateProfileForm() {
       <form
         noValidate
         className="grid auto-rows-max items-start gap-4 md:gap-8"
-        onSubmit={form.handleSubmit(onSubmit, (e) => console.log(e))}
+        onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}
         onReset={reset}
       >
         <Card x-chunk="dashboard-07-chunk-0">

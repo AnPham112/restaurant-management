@@ -1,16 +1,11 @@
 import accountApiRequest from '@/apiRequests/account'
-import { QueryKey, QueryOptions, ResponseApi } from '@/constants/type'
+import { QueryKey, QueryOptions } from '@/constants/type'
 import {
   AccountListResType,
   AccountResType,
   UpdateEmployeeAccountBodyType,
 } from '@/schemaValidations/account.schema'
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  UseQueryOptions,
-} from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useAccountMe = () => {
   return useQuery({
@@ -52,13 +47,15 @@ export const useGetAccountList = (
   })
 }
 
-export const useGetAccount = (
-  { id }: { id: number },
-  options?: QueryOptions<AccountResType>,
-) => {
+export const useGetAccount = ({
+  id,
+  enabled,
+  ...options
+}: { id: number; enabled: boolean } & QueryOptions<AccountResType>) => {
   return useQuery({
     queryKey: [QueryKey.ACCOUNTS, id],
     queryFn: () => accountApiRequest.getEmployee(id),
+    enabled,
     ...options,
   })
 }
@@ -86,6 +83,7 @@ export const useUpdateAccountMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKey.ACCOUNTS],
+        exact: true,
       })
     },
   })
