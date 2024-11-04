@@ -72,4 +72,6 @@ export type QueryOptions<T> = Omit<
 
 export const QueryKey = {
   ACCOUNTS: 'accounts',
+  // Dish
+  DISHES: 'dishes',
 } as const
