@@ -50,8 +50,8 @@ export default function ChangePasswordForm() {
       <form
         noValidate
         className="grid auto-rows-max items-start gap-4 md:gap-8"
-        onSubmit={form.handleSubmit(onSubmit, (error) => {
-          console.log(error)
+        onSubmit={form.handleSubmit(onSubmit, (err) => {
+          console.log(err)
         })}
         onReset={reset}
       >
