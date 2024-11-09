@@ -47,6 +47,7 @@ export default function UpdateProfileForm() {
     setFile(null)
     form.setValue('avatar', '')
     field.onChange('')
+    // fix behavior xóa image cũ rồi không chọn được image đó nữa -> set value của input field là string rỗng
     if (avatarInputRef.current) {
       avatarInputRef.current.value = ''
     }
