@@ -21,7 +21,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
-import { getVietnameseTableStatus } from '@/lib/utils'
+import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import {
   CreateTableBody,
   CreateTableBodyType,
@@ -34,9 +34,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useAddTableMutation } from '@/queries/useTable'
+import { toast } from '@/components/ui/use-toast'
 
 export default function AddTable() {
   const [open, setOpen] = useState(false)
+  const addTableMutation = useAddTableMutation()
+
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: {
@@ -45,8 +49,39 @@ export default function AddTable() {
       status: TableStatus.Hidden,
     },
   })
+
+  const onSubmit = async (values: CreateTableBodyType) => {
+    if (addTableMutation.isPending) return
+
+    try {
+      const result = await addTableMutation.mutateAsync(values)
+      toast({
+        description: result.payload.message,
+      })
+      reset()
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      })
+    }
+  }
+
+  const reset = () => {
+    form.reset()
+  }
+
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        if (!value) {
+          reset()
+        }
+        setOpen(value)
+      }}
+      open={open}
+    >
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
@@ -67,6 +102,8 @@ export default function AddTable() {
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="add-table-form"
+            onSubmit={form.handleSubmit(onSubmit, console.log)}
+            onReset={reset}
           >
             <div className="grid gap-4 py-4">
               <FormField
